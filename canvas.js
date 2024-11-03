@@ -1,17 +1,34 @@
-var c = document.getElementById("myCanvas");
-var ctx = c.getContext("2d");
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
 ctx.beginPath();
 ctx.arc(95, 50, 40, 0, 2 * Math.PI);
 ctx.stroke();
 
-let x = 0;
 const size = 30;
-const id = setInterval(() => {
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.fillRect(x, 50, size, size);
-    x += size;
+ctx.fillStyle = 'blue';
 
-    if (x >= c.width) {
-        clearInterval(id);
-    }
-}, 200);  
+let squares = [];
+let started = false;
+
+function play() {
+  // Add 0 as x value for object to start from the left.
+  squares.push(0);
+
+  if (!started) {
+      started = true;
+      setInterval(() => {
+        tick();
+      }, 200)
+  }
+}
+
+function tick() {
+  // Clear canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Paint objects
+  squares.forEach(x => ctx.fillRect(x, 50, size, size));
+
+  squares = squares.map(x => x += size) // move x to right
+      .filter(x => x < canvas.width);  // remove when at end
+}
