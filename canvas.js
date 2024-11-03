@@ -9,17 +9,15 @@ ctx.fillStyle = 'blue';
 
 let squares = [];
 let started = false;
+let start = 0;
 
 function play() {
-  // Add 0 as x value for object to start from the left.
-  squares.push(0);
+    // Add 0 as x value for object to start from the left.
+    squares.push(0);
 
-  if (!started) {
-      started = true;
-      setInterval(() => {
-        tick();
-      }, 200)
-  }
+    if (!started) {
+        animate();
+    }
 }
 
 function tick() {
@@ -31,4 +29,13 @@ function tick() {
 
   squares = squares.map(x => x += size) // move x to right
       .filter(x => x < canvas.width);  // remove when at end
+}
+
+function animate(timestamp) {
+    const elapsed  = timestamp - start;
+    if (elapsed > 20) {
+      start = timestamp;
+      tick();
+    }
+    requestAnimationFrame(animate);  
 }
