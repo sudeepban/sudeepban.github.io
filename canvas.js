@@ -1,17 +1,24 @@
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-ctx.beginPath();
-ctx.arc(95, 50, 40, 0, 2 * Math.PI);
-ctx.stroke();
 
-const size = 30;
 ctx.fillStyle = 'blue';
 
 let squares = [];
 let started = false;
 let start = 0;
+let size = 30;
 
 function play() {
+    red = parseInt(document.getElementById("red").value);
+    green = parseInt(document.getElementById("green").value);
+    blue = parseInt(document.getElementById("blue").value);
+    
+    size = parseInt(document.getElementById("size").value);
+
+    if (red >= 0 && red <= 255 && green >=0 && green <= 255 && blue >= 0 && blue <= 255) {
+        ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, 1.0)`
+    }
+
     // Add 0 as x value for object to start from the left.
     squares.push(0);
 
@@ -21,14 +28,14 @@ function play() {
 }
 
 function tick() {
-  // Clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Paint objects
-  squares.forEach(x => ctx.fillRect(x, 50, size, size));
+    // Paint objects
+    squares.forEach(x => ctx.fillRect(x, 50, size, size));
+    squares = squares.map(x => x += size) // move x to right
+        .filter(x => x < canvas.width);  // remove when at end
 
-  squares = squares.map(x => x += size) // move x to right
-      .filter(x => x < canvas.width);  // remove when at end
 }
 
 function animate(timestamp) {
