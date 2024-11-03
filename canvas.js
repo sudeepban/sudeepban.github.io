@@ -39,10 +39,10 @@ function tick() {
 }
 
 function animate(timestamp) {
-    //const elapsed  = timestamp - start;
-    //if (elapsed > 20) {
-    //start = timestamp;
-    tick();
-    //}
+    const elapsed  = timestamp - start;
+    if (elapsed > 1) {
+        start = timestamp;
+        tick();
+    }
     requestAnimationFrame(animate);  
 }
