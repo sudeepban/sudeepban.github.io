@@ -1,15 +1,28 @@
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 
-ctx.fillStyle = 'blue';
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 let squares = [];
 let started = false;
 let start = 0;
 let size = 50;
 let speed = 10;
+let textColor = "black"
+let shapeColor = "blue"
+let title = "HELLO WORLD!"
+let count = 0;
+let numBlocks = 30;
+let squareWidth = canvas.width / numBlocks;
+let squareHeight = canvas.height / numBlocks;
+
+if (!started) {
+    animate();
+}
 
 function play() {
+    console.log("here")
     red = parseInt(document.getElementById("red").value);
     green = parseInt(document.getElementById("green").value);
     blue = parseInt(document.getElementById("blue").value);
@@ -18,7 +31,7 @@ function play() {
     speed = parseInt(document.getElementById("speed").value);
 
     if (red >= 0 && red <= 255 && green >=0 && green <= 255 && blue >= 0 && blue <= 255) {
-        ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, 1.0)`
+        shapeColor = `rgba(${red}, ${green}, ${blue}, 1.0)`
     }
 
     // Add 0 as x value for object to start from the left.
@@ -34,13 +47,36 @@ function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Paint objects
-    squares.forEach(x => ctx.fillRect(x, 50, size, size));
-    squares = squares.map(x => x += speed) // move x to right
-        .filter(x => x < canvas.width);  // remove when at end
+    ctx.fillStyle = shapeColor;
+
+    currCount = count;
+    for (currCount = count; currCount >= count - 4; currCount--) {
+        if (currCount % 2 != 0) {
+            ctx.fillStyle = "blue";
+        } else {
+            ctx.fillStyle = "red";
+        }
+        for (i = 0; i <= currCount; i++) {
+            for (j = 0; j <= currCount; j++) {
+                if (i == j) {
+                    ctx.fillRect((currCount - i) * squareWidth, j * squareHeight, squareWidth, squareHeight);
+                    ctx.fillRect((numBlocks - (currCount - i) - 1) * squareWidth, j * squareHeight, squareWidth, squareHeight);
+                    ctx.fillRect((currCount - i) * squareWidth, (numBlocks - j - 1) * squareHeight, squareWidth, squareHeight);
+                    ctx.fillRect((numBlocks - (currCount - i) - 1) * squareWidth, (numBlocks - j - 1) * squareHeight, squareWidth, squareHeight);
+                }
+            }
+        }
+    }
+
+    ctx.fillStyle = textColor;
+    ctx.font = "100px Lucida Console";
+    ctx.fillText(title, (canvas.width / 2) - (ctx.measureText(title).width / 2), canvas.height / 2);
 
 }
 
 function animate(timestamp) {
+    started = true
+
     const elapsed  = timestamp - start;
     if (elapsed > 1) {
         start = timestamp;
@@ -48,3 +84,17 @@ function animate(timestamp) {
     }
     requestAnimationFrame(animate);  
 }
+
+window.onload = function() {
+    // Code to execute when the page has fully loaded
+    console.log("Page is fully loaded!"); 
+
+    const timer = setInterval(() => {
+        count++;
+        console.log(count);
+        play();
+        if (count >= numBlocks * 2) {
+            count = 0;
+        }
+    }, 100);
+};
