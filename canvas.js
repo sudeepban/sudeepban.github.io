@@ -51,11 +51,15 @@ function tick() {
 
     currCount = count;
     for (currCount = count; currCount >= count - 4; currCount--) {
-        if (currCount % 2 != 0) {
-            ctx.fillStyle = "blue";
-        } else {
-            ctx.fillStyle = "red";
-        }
+        colorIndex = currCount % 6
+        match colorIndex:
+            case 0: ctx.fillStyle = "red"
+            case 1: ctx.fillStyle = "orange"
+            case 2: ctx.fillStyle = "yellow"
+            case 3: ctx.fillStyle = "green"
+            case 4: ctx.fillStyle = "blue"
+            case 5: ctx.fillStyle = "purple"
+
         for (i = 0; i <= currCount; i++) {
             for (j = 0; j <= currCount; j++) {
                 if (i == j) {
