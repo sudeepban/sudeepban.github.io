@@ -1,43 +1,32 @@
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 
+ctx.textAlign = "center"
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let flip = false;
-let squares = [];
 let started = false;
 let start = 0;
-let size = 50;
-let speed = 10;
-let textColor = "black"
+let textColor = "white"
 let shapeColor = "blue"
-let title = "HELLO WORLD!"
+let title = "satisfying.js"
 let count = 0;
 let numBlocks = 45;
 let squareWidth = canvas.width / numBlocks;
 let squareHeight = canvas.height / numBlocks;
+
+var buttons = []
+var enterButton = new Button('ENTER', 'black', 'white', canvas.width / 2 - 100, canvas.height / 2 - 40, 200, 80)
+enterButton.onClick = function () { return console.log('ENTERING SATISFYING.JS!'); };
+buttons.push(enterButton);
 
 if (!started) {
     animate();
 }
 
 function play() {
-    console.log("here")
-    red = parseInt(document.getElementById("red").value);
-    green = parseInt(document.getElementById("green").value);
-    blue = parseInt(document.getElementById("blue").value);
-    
-    size = parseInt(document.getElementById("size").value);
-    speed = parseInt(document.getElementById("speed").value);
-
-    if (red >= 0 && red <= 255 && green >=0 && green <= 255 && blue >= 0 && blue <= 255) {
-        shapeColor = `rgba(${red}, ${green}, ${blue}, 1.0)`
-    }
-
-    // Add 0 as x value for object to start from the left.
-    squares.push(0);
-
     if (!started) {
         animate();
     }
@@ -50,6 +39,11 @@ function tick() {
     ctx.fillStyle = "black"
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    ctx.fillStyle = textColor;
+    ctx.font = "100px Lucida Console";
+    ctx.font = "100px Georgia, serif";
+    ctx.fillText(title, canvas.width / 2, canvas.height / 3);
+
     // Paint objects
     ctx.fillStyle = shapeColor;
 
@@ -59,6 +53,11 @@ function tick() {
         ctx.globalAlpha += (!flip ? -0.075 : 0.075);
         ctx.globalAlpha = Math.max(0, ctx.globalAlpha);
         ctx.globalAlpha = Math.min(1, ctx.globalAlpha);
+
+        if (flip && currCount <= count - 10) {
+            ctx.globalAlpha = 0.0;
+        }
+
         colorIndex = currCount % 6;
         switch(colorIndex) {
             case 0: ctx.fillStyle = "red"; break;
@@ -81,11 +80,8 @@ function tick() {
     }
 
     ctx.globalAlpha = 1.0;
-
-    ctx.fillStyle = textColor;
-    ctx.font = "100px Lucida Console";
-    ctx.fillText(title, (canvas.width / 2) - (ctx.measureText(title).width / 2), canvas.height / 2);
-
+    
+    buttons.forEach(function (b) { return b.draw(ctx); });
 }
 
 function animate(timestamp) {
@@ -96,17 +92,16 @@ function animate(timestamp) {
         start = timestamp;
         tick();
     }
+
     requestAnimationFrame(animate);  
 }
 
 window.onload = function() {
     // Code to execute when the page has fully loaded
-    console.log("Page is fully loaded!"); 
-
     const timer = setInterval(() => {
         count += (!flip ? 1 : -1);
         play();
-        if (count >= numBlocks) {
+        if (count >= numBlocks + 3) {
             flip = true;
         } 
         if (count == 0) {
@@ -114,3 +109,12 @@ window.onload = function() {
         }
     }, 100);
 };
+
+canvas.addEventListener('click', function (event) {
+    var x = event.pageX - (canvas.clientLeft + canvas.offsetLeft);
+    var y = event.pageY - (canvas.clientTop + canvas.offsetTop);
+    buttons.forEach(function (b) {
+        if (b.inBounds(x, y) && !!b.onClick)
+            b.onClick();
+    });
+});
