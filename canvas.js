@@ -4,6 +4,7 @@ var ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let flip = false;
 let squares = [];
 let started = false;
 let start = 0;
@@ -13,7 +14,7 @@ let textColor = "black"
 let shapeColor = "blue"
 let title = "HELLO WORLD!"
 let count = 0;
-let numBlocks = 30;
+let numBlocks = 45;
 let squareWidth = canvas.width / numBlocks;
 let squareHeight = canvas.height / numBlocks;
 
@@ -52,9 +53,13 @@ function tick() {
     // Paint objects
     ctx.fillStyle = shapeColor;
 
-    currCount = count;
-    for (currCount = count; currCount >= count - 4; currCount--) {
-        colorIndex = currCount % 6
+    ctx.globalAlpha = (!flip ? 1.0 : 0.0);
+
+    for (currCount = count; currCount >= 0; currCount--) {
+        ctx.globalAlpha += (!flip ? -0.075 : 0.075);
+        ctx.globalAlpha = Math.max(0, ctx.globalAlpha);
+        ctx.globalAlpha = Math.min(1, ctx.globalAlpha);
+        colorIndex = currCount % 6;
         switch(colorIndex) {
             case 0: ctx.fillStyle = "red"; break;
             case 1: ctx.fillStyle = "orange"; break;
@@ -74,6 +79,8 @@ function tick() {
             }
         }
     }
+
+    ctx.globalAlpha = 1.0;
 
     ctx.fillStyle = textColor;
     ctx.font = "100px Lucida Console";
@@ -97,11 +104,13 @@ window.onload = function() {
     console.log("Page is fully loaded!"); 
 
     const timer = setInterval(() => {
-        count++;
-        console.log(count);
+        count += (!flip ? 1 : -1);
         play();
-        if (count >= numBlocks * 2) {
-            count = 0;
+        if (count >= numBlocks) {
+            flip = true;
+        } 
+        if (count == 0) {
+            flip = false;
         }
     }, 100);
 };
