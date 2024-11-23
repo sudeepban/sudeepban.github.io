@@ -6,20 +6,35 @@ ctx.textAlign = "center"
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const PageState = Object.freeze({
+    INTRO: 0,
+    ENTERED1: 1,
+    ENTERED2: 2,
+    ENTERED3: 3
+});
+
 let flip = false;
 let started = false;
+let pageState = PageState.INTRO;
+let enteredCount = 0;
 let start = 0;
 let textColor = "white"
 let shapeColor = "blue"
 let title = "satisfying.js"
 let count = 0;
 let numBlocks = 45;
-let squareWidth = canvas.width / numBlocks;
-let squareHeight = canvas.height / numBlocks;
+let origSquareWidth = canvas.width / numBlocks;
+let origSquareHeight = canvas.height / numBlocks;
 
 var buttons = []
 var enterButton = new Button('ENTER', 'black', 'white', canvas.width / 2 - 100, canvas.height / 2 - 40, 200, 80)
-enterButton.onClick = function () { return console.log('ENTERING SATISFYING.JS!'); };
+enterButton.onClick = function () {
+    if (pageState == PageState.INTRO) {
+        pageState = PageState.ENTERED1;
+        enteredCount = 100;
+        return console.log('ENTERING SATISFYING.JS!');
+    }
+};
 buttons.push(enterButton);
 
 if (!started) {
@@ -39,41 +54,57 @@ function tick() {
     ctx.fillStyle = "black"
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = textColor;
-    ctx.font = "100px Lucida Console";
-    ctx.font = "100px Georgia, serif";
-    ctx.fillText(title, canvas.width / 2, canvas.height / 3);
+    if (pageState == PageState.ENTERED1 || pageState == PageState.ENTERED2 || pageState == PageState.ENTERED3) {
+        ctx.globalAlpha = 1.0 * enteredCount / 100;
+    }
+
+    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
+        ctx.fillStyle = textColor;
+        ctx.font = "100px Lucida Console";
+        ctx.font = "100px Georgia, serif";
+        ctx.fillText(title, canvas.width / 2, canvas.height / 3);
+    }
 
     // Paint objects
     ctx.fillStyle = shapeColor;
 
     ctx.globalAlpha = (!flip ? 1.0 : 0.0);
 
-    for (currCount = count; currCount >= 0; currCount--) {
-        ctx.globalAlpha += (!flip ? -0.075 : 0.075);
-        ctx.globalAlpha = Math.max(0, ctx.globalAlpha);
-        ctx.globalAlpha = Math.min(1, ctx.globalAlpha);
-
-        if (flip && currCount <= count - 10) {
-            ctx.globalAlpha = 0.0;
+    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
+        if (pageState == PageState.ENTERED1) {
+            squareWidth = (enteredCount / 100) * origSquareWidth;
+            squareHeight = (enteredCount / 100) * origSquareHeight;
+        } else {
+            squareWidth = origSquareWidth;
+            squareHeight = origSquareHeight;
         }
 
-        colorIndex = currCount % 6;
-        switch(colorIndex) {
-            case 0: ctx.fillStyle = "red"; break;
-            case 1: ctx.fillStyle = "orange"; break;
-            case 2: ctx.fillStyle = "yellow"; break;
-            case 3: ctx.fillStyle = "green"; break;
-            case 4: ctx.fillStyle = "blue"; break;
-            case 5: ctx.fillStyle = "purple"; break;
-        }
-        for (i = 0; i <= currCount; i++) {
-            for (j = 0; j <= currCount; j++) {
-                if (i == j) {
-                    ctx.fillRect((currCount - i) * squareWidth, j * squareHeight, squareWidth, squareHeight);
-                    ctx.fillRect((numBlocks - (currCount - i) - 1) * squareWidth, j * squareHeight, squareWidth, squareHeight);
-                    ctx.fillRect((currCount - i) * squareWidth, (numBlocks - j - 1) * squareHeight, squareWidth, squareHeight);
-                    ctx.fillRect((numBlocks - (currCount - i) - 1) * squareWidth, (numBlocks - j - 1) * squareHeight, squareWidth, squareHeight);
+        for (currCount = count; currCount >= 0; currCount--) {
+            ctx.globalAlpha += (!flip ? -0.075 : 0.075);
+            ctx.globalAlpha = Math.max(0, ctx.globalAlpha);
+            ctx.globalAlpha = Math.min(1, ctx.globalAlpha);
+
+            if (flip && currCount <= count - 10) {
+                ctx.globalAlpha = 0.0;
+            }
+
+            colorIndex = currCount % 6;
+            switch(colorIndex) {
+                case 0: ctx.fillStyle = "red"; break;
+                case 1: ctx.fillStyle = "orange"; break;
+                case 2: ctx.fillStyle = "yellow"; break;
+                case 3: ctx.fillStyle = "green"; break;
+                case 4: ctx.fillStyle = "blue"; break;
+                case 5: ctx.fillStyle = "purple"; break;
+            }
+            for (i = 0; i <= currCount; i++) {
+                for (j = 0; j <= currCount; j++) {
+                    if (i == j) {
+                        ctx.fillRect((currCount - i) * origSquareWidth, j * origSquareHeight, squareWidth, squareHeight);
+                        ctx.fillRect((numBlocks - (currCount - i) - 1) * origSquareWidth, j * origSquareHeight, squareWidth, squareHeight);
+                        ctx.fillRect((currCount - i) * origSquareWidth, (numBlocks - j - 1) * origSquareHeight, squareWidth, squareHeight);
+                        ctx.fillRect((numBlocks - (currCount - i) - 1) * origSquareWidth, (numBlocks - j - 1) * origSquareHeight, squareWidth, squareHeight);
+                    }
                 }
             }
         }
@@ -81,7 +112,28 @@ function tick() {
 
     ctx.globalAlpha = 1.0;
     
-    buttons.forEach(function (b) { return b.draw(ctx); });
+    if (pageState == PageState.ENTERED1 || pageState == PageState.ENTERED2) {
+        ctx.globalAlpha = 1.0 * enteredCount / 100;
+    }
+
+    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
+        buttons.forEach(function (b) { return b.draw(ctx); });
+    }
+
+    if (pageState == PageState.ENTERED1) {
+        if (enteredCount != 0) {
+            enteredCount--;
+        } else {
+            pageState = PageState.ENTERED2;
+        }
+    }
+
+    if (pageState == PageState.ENTERED2) {
+        enteredCount++;
+        if (enteredCount >= 100) {
+            pageState = PageState.ENTERED3;
+        }
+    }
 }
 
 function animate(timestamp) {
