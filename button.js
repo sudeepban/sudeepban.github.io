@@ -21,17 +21,17 @@ var Button = /** @class */ (function () {
     Button.prototype.draw = function (c) {
         if (this.color == this.hoverColor) {
             if (this.hoverState == 0) {
-                this.xAdj = 5;
+                this.xAdj = 2;
                 this.yAdj = 0;
             } else if (this.hoverState == 1) {
-                this.xAdj = -5;
+                this.xAdj = -2;
                 this.yAdj = 0;
             } else if (this.hoverState == 2) {
                 this.xAdj = 0;
-                this.yAdj = -5;
+                this.yAdj = -2;
             } else if (this.hoverState == 3) {
                 this.xAdj = 0;
-                this.yAdj = 5;
+                this.yAdj = 2;
             }
         } else {
             this.xAdj = 0;
