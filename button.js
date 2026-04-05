@@ -1,7 +1,8 @@
 var Button = /** @class */ (function () {
-    function Button(text, fillColor, hoverColor, pressColor, textColor, x, y, width, height) {
+    function Button(text, fillColor, hoverColor, pressColor, textColor, x, y, width, height, fontSize) {
         if (fillColor === void 0) { fillColor = '#ffffff'; }
         if (textColor === void 0) { textColor = '#000000'; }
+        if (fontSize === void 0) { fontSize = 25; }
         this.x = x;
         this.y = y;
         this.width = width;
@@ -11,6 +12,7 @@ var Button = /** @class */ (function () {
         this.hoverColor = hoverColor;
         this.pressColor = pressColor;
         this.textColor = textColor;
+        this.fontSize = fontSize;
         this.color = this.fillColor;
         this.hoverState = 0;
         this.xAdj = 0;
@@ -38,7 +40,7 @@ var Button = /** @class */ (function () {
         c.beginPath();
         c.fillStyle = this.color;
         c.roundRect(this.x + this.xAdj, this.y + this.yAdj, this.width, this.height, 10);
-        c.font = '25px arial';
+        c.font = this.fontSize + 'px arial';
         c.lineWidth = 20;
         c.strokeStyle = this.textColor;
         c.stroke();
@@ -47,8 +49,24 @@ var Button = /** @class */ (function () {
         c.fillStyle = this.textColor;
         c.textAlign = 'center';
         c.textBaseline = 'middle';
-        c.fillStyle = this.textColor;
-        c.fillText(this.text, this.x + this.xAdj + this.width / 2, this.y + this.yAdj + this.height / 2, this.width);
+        var words = this.text.split(' ');
+        var lines = [];
+        var line = '';
+        for (var i = 0; i < words.length; i++) {
+            var testLine = line ? line + ' ' + words[i] : words[i];
+            if (c.measureText(testLine).width > this.width - 20 && line) {
+                lines.push(line);
+                line = words[i];
+            } else {
+                line = testLine;
+            }
+        }
+        lines.push(line);
+        var lineHeight = this.fontSize * 1.3;
+        var startY = this.y + this.yAdj + this.height / 2 - (lines.length - 1) * lineHeight / 2;
+        for (var i = 0; i < lines.length; i++) {
+            c.fillText(lines[i], this.x + this.xAdj + this.width / 2, startY + i * lineHeight);
+        }
         this.hoverState++;
         if (this.hoverState == 4) {
             this.hoverState = 0;

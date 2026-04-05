@@ -41,7 +41,7 @@ introButtons.push(enterButton);
 
 var selectionButtons = []
 
-var testSelectionButton = new Button('Bouncing Objects', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200)
+var testSelectionButton = new Button('Bouncing Objects', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200, 22)
 testSelectionButton.onClick = function () {
     console.log("Clicked test selection!")
 };
