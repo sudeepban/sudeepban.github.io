@@ -10,7 +10,7 @@ const PageState = Object.freeze({
     INTRO: 0,
     ENTERED1: 1,
     ENTERED2: 2,
-    ENTERED3: 3
+    SELECTION: 3
 });
 
 let flip = false;
@@ -26,8 +26,9 @@ let numBlocks = 45;
 let origSquareWidth = canvas.width / numBlocks;
 let origSquareHeight = canvas.height / numBlocks;
 
-var buttons = []
-var enterButton = new Button('ENTER', 'black', 'white', canvas.width / 2 - 100, canvas.height / 2 - 40, 200, 80)
+var introButtons = []
+
+var enterButton = new Button('ENTER', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, canvas.height / 2 - 40, 200, 80)
 enterButton.onClick = function () {
     if (pageState == PageState.INTRO) {
         pageState = PageState.ENTERED1;
@@ -35,7 +36,27 @@ enterButton.onClick = function () {
         return console.log('ENTERING SATISFYING.JS!');
     }
 };
-buttons.push(enterButton);
+
+introButtons.push(enterButton);
+
+var selectionButtons = []
+
+var testSelectionButton = new Button('Test Selection', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200)
+testSelectionButton.onClick = function () {
+    console.log("Clicked test selection!")
+};
+var barSelectionButton = new Button('Bar Selection', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, canvas.height / 4 - 100, 200, 200)
+barSelectionButton.onClick = function () {
+    console.log("Clicked bar selection!")
+};
+var fooSelectionButton = new Button('Foo Selection', 'black', 'red', 'blue', 'white', 3 * canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200)
+fooSelectionButton.onClick = function () {
+    console.log("Clicked foo selection!")
+};
+
+selectionButtons.push(testSelectionButton);
+selectionButtons.push(barSelectionButton);
+selectionButtons.push(fooSelectionButton);
 
 if (!started) {
     animate();
@@ -54,11 +75,21 @@ function tick() {
     ctx.fillStyle = "black"
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (pageState == PageState.ENTERED1 || pageState == PageState.ENTERED2 || pageState == PageState.ENTERED3) {
+    if (pageState < PageState.SELECTION) {
+        handleIntro();
+    } else {
+        handleSelection();
+    }
+}
+
+function handleIntro() {
+    buttons = introButtons;
+
+    if (pageState == PageState.ENTERED1 || pageState == PageState.ENTERED2) {
         ctx.globalAlpha = 1.0 * enteredCount / 100;
     }
 
-    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
+    if (pageState != PageState.ENTERED2) {
         ctx.fillStyle = textColor;
         ctx.font = "100px Lucida Console";
         ctx.font = "100px Georgia, serif";
@@ -70,7 +101,7 @@ function tick() {
 
     ctx.globalAlpha = (!flip ? 1.0 : 0.0);
 
-    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
+    if (pageState != PageState.ENTERED2) {
         if (pageState == PageState.ENTERED1) {
             squareWidth = (enteredCount / 100) * origSquareWidth;
             squareHeight = (enteredCount / 100) * origSquareHeight;
@@ -116,8 +147,8 @@ function tick() {
         ctx.globalAlpha = 1.0 * enteredCount / 100;
     }
 
-    if (pageState != PageState.ENTERED2 && pageState != PageState.ENTERED3) {
-        buttons.forEach(function (b) { return b.draw(ctx); });
+    if (pageState != PageState.ENTERED2) {
+        introButtons.forEach(function (b) { return b.draw(ctx); });
     }
 
     if (pageState == PageState.ENTERED1) {
@@ -131,9 +162,19 @@ function tick() {
     if (pageState == PageState.ENTERED2) {
         enteredCount++;
         if (enteredCount >= 100) {
-            pageState = PageState.ENTERED3;
+            pageState = PageState.SELECTION;
+            console.log("GOT TO SELECTION")
         }
     }
+}
+
+function handleSelection() {
+    buttons = selectionButtons;
+
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    selectionButtons.forEach(function (b) { return b.draw(ctx); });
 }
 
 function animate(timestamp) {
@@ -170,3 +211,51 @@ canvas.addEventListener('click', function (event) {
             b.onClick();
     });
 });
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    buttons.forEach(function (b) {
+        if (mouseX > b.x && mouseX < b.x + b.width && mouseY > b.y && mouseY < b.y + b.height) {
+            if (mouseDown == 0) {
+                b.color = b.hoverColor;
+            }
+        } else {
+            b.color = b.fillColor;
+        }
+    });
+});
+
+canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    buttons.forEach(function (b) {
+        if (mouseX > b.x && mouseX < b.x + b.width && mouseY > b.y && mouseY < b.y + b.height) {
+            b.color = b.pressColor;
+        }
+    });
+});
+
+canvas.addEventListener('mouseup', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    buttons.forEach(function (b) {
+        if (mouseX > b.x && mouseX < b.x + b.width && mouseY > b.y && mouseY < b.y + b.height) {
+            b.color = b.hoverColor;
+        }
+    });
+});
+
+var mouseDown = 0;
+document.body.onmousedown = function() { 
+  ++mouseDown;
+}
+document.body.onmouseup = function() {
+  --mouseDown;
+}
