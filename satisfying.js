@@ -54,6 +54,28 @@ fooSelectionButton.onClick = function () {
     console.log("Clicked foo selection!")
 };
 
+function handleResize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    origSquareWidth = canvas.width / numBlocks;
+    origSquareHeight = canvas.height / numBlocks;
+
+    enterButton.x = canvas.width / 2 - 100;
+    enterButton.y = canvas.height / 2 - 40;
+
+    testSelectionButton.x = canvas.width / 4 - 100;
+    testSelectionButton.y = canvas.height / 4 - 100;
+
+    barSelectionButton.x = canvas.width / 2 - 100;
+    barSelectionButton.y = canvas.height / 4 - 100;
+
+    fooSelectionButton.x = 3 * canvas.width / 4 - 100;
+    fooSelectionButton.y = canvas.height / 4 - 100;
+}
+
+window.addEventListener('resize', handleResize);
+
 selectionButtons.push(testSelectionButton);
 selectionButtons.push(barSelectionButton);
 selectionButtons.push(fooSelectionButton);
