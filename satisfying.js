@@ -39,24 +39,60 @@ enterButton.onClick = function () {
 
 introButtons.push(enterButton);
 
-var selectionButtons = []
+let selectedCategory = 'visuals';
 
-var testSelectionButton = new Button('Bouncing Objects', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200, 22)
-testSelectionButton.onClick = function () {
-    console.log("Clicked test selection!")
-};
-var barSelectionButton = new Button('Bar Selection', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, canvas.height / 4 - 100, 200, 200)
-barSelectionButton.onClick = function () {
-    console.log("Clicked bar selection!")
-};
-var fooSelectionButton = new Button('Foo Selection', 'black', 'red', 'blue', 'white', 3 * canvas.width / 4 - 100, canvas.height / 4 - 100, 200, 200)
-fooSelectionButton.onClick = function () {
-    console.log("Clicked foo selection!")
-};
+// Category tab buttons
+var tabY = 30;
+var tabW = 190;
+var tabH = 50;
+var tabGap = 20;
+var tabsTotal = 3 * tabW + 2 * tabGap;
+var tabX0 = canvas.width / 2 - tabsTotal / 2;
 
-selectionButtons.push(testSelectionButton);
-selectionButtons.push(barSelectionButton);
-selectionButtons.push(fooSelectionButton);
+var visualsTab = new Button('Visuals', '#222', '#444', '#555', 'white', tabX0, tabY, tabW, tabH, 17);
+visualsTab.onClick = function () { selectedCategory = 'visuals'; };
+
+var simulationsTab = new Button('Simulations', '#222', '#444', '#555', 'white', tabX0 + tabW + tabGap, tabY, tabW, tabH, 17);
+simulationsTab.onClick = function () { selectedCategory = 'simulations'; };
+
+var interactiveTab = new Button('Interactive Sims', '#222', '#444', '#555', 'white', tabX0 + 2 * (tabW + tabGap), tabY, tabW, tabH, 17);
+interactiveTab.onClick = function () { selectedCategory = 'interactive'; };
+
+var categoryTabs = [visualsTab, simulationsTab, interactiveTab];
+
+// Per-category button sets
+var contentY = canvas.height / 4;
+var contentH = 200;
+var contentW = 200;
+
+var visualsButtons = [
+    new Button('Bouncing Objects', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, contentY, contentW, contentH, 22),
+    new Button('Bar Selection', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, contentY, contentW, contentH),
+    new Button('Foo Selection', 'black', 'red', 'blue', 'white', 3 * canvas.width / 4 - 100, contentY, contentW, contentH)
+];
+visualsButtons[0].onClick = function () { console.log("Clicked Bouncing Objects!"); };
+visualsButtons[1].onClick = function () { console.log("Clicked Bar Selection!"); };
+visualsButtons[2].onClick = function () { console.log("Clicked Foo Selection!"); };
+
+var simulationsButtons = [
+    new Button('Sim A', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, contentY, contentW, contentH),
+    new Button('Sim B', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, contentY, contentW, contentH)
+];
+simulationsButtons[0].onClick = function () { console.log("Clicked Sim A!"); };
+simulationsButtons[1].onClick = function () { console.log("Clicked Sim B!"); };
+
+var interactiveButtons = [
+    new Button('Interactive A', 'black', 'red', 'blue', 'white', canvas.width / 4 - 100, contentY, contentW, contentH),
+    new Button('Interactive B', 'black', 'red', 'blue', 'white', canvas.width / 2 - 100, contentY, contentW, contentH)
+];
+interactiveButtons[0].onClick = function () { console.log("Clicked Interactive A!"); };
+interactiveButtons[1].onClick = function () { console.log("Clicked Interactive B!"); };
+
+var categoryButtonSets = {
+    'visuals': visualsButtons,
+    'simulations': simulationsButtons,
+    'interactive': interactiveButtons
+};
 
 if (!started) {
     animate();
@@ -169,12 +205,19 @@ function handleIntro() {
 }
 
 function handleSelection() {
-    buttons = selectionButtons;
+    var currentContent = categoryButtonSets[selectedCategory];
+    buttons = categoryTabs.concat(currentContent);
 
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    selectionButtons.forEach(function (b) { return b.draw(ctx); });
+    // Draw active tab underline indicator
+    var activeTab = { 'visuals': visualsTab, 'simulations': simulationsTab, 'interactive': interactiveTab }[selectedCategory];
+    ctx.fillStyle = 'white';
+    ctx.fillRect(activeTab.x, activeTab.y + activeTab.height + 4, activeTab.width, 3);
+
+    categoryTabs.forEach(function (b) { return b.draw(ctx); });
+    currentContent.forEach(function (b) { return b.draw(ctx); });
 }
 
 function animate(timestamp) {
