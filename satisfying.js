@@ -94,6 +94,31 @@ var categoryButtonSets = {
     'interactive': interactiveButtons
 };
 
+function handleResize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    origSquareWidth = canvas.width / numBlocks;
+    origSquareHeight = canvas.height / numBlocks;
+
+    enterButton.x = canvas.width / 2 - 100;
+    enterButton.y = canvas.height / 2 - 40;
+
+    var newTabX0 = canvas.width / 2 - tabsTotal / 2;
+    visualsTab.x = newTabX0;
+    simulationsTab.x = newTabX0 + tabW + tabGap;
+    interactiveTab.x = newTabX0 + 2 * (tabW + tabGap);
+
+    var newContentY = canvas.height / 4;
+    [visualsButtons, simulationsButtons, interactiveButtons].forEach(function (set) {
+        set[0].x = canvas.width / 4 - 100;  set[0].y = newContentY;
+        set[1].x = canvas.width / 2 - 100;  set[1].y = newContentY;
+        if (set[2]) { set[2].x = 3 * canvas.width / 4 - 100; set[2].y = newContentY; }
+    });
+}
+
+window.addEventListener('resize', handleResize);
+
 if (!started) {
     animate();
 }
